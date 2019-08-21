@@ -30,7 +30,7 @@ def crop(image, rows, columns):
 def base64_to_cv2(encoded_data):
     d = base64.b64decode(encoded_data)
     nparr = np.fromstring(d, np.uint8)
-    return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    return cv2.imdecode(nparr, cv2.IMREAD_UNCHANGED)
 
 
 def process_image(encoded_image):

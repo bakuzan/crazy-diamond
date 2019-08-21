@@ -1,7 +1,7 @@
 import '@/elements/router-link';
+import '@/home';
+import '@/puzzle';
 import { css, customElement, html, LitElement, property } from 'lit-element';
-import './home';
-import './puzzle';
 import router from './router';
 
 @customElement('czd-router-view')

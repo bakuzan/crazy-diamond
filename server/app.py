@@ -1,52 +1,42 @@
-from flask import Flask, Blueprint, flash, request, jsonify
+from flask import Flask, Blueprint, jsonify
 from flask_cors import CORS
-from werkzeug.utils import secure_filename
-import base64
 
-import config
-from process import process_image
+from config import AppConfig
+from request_middleware import log_request_info
+from route_list import list_routes
+from api.index import api_blueprint
+
 
 # instantiate the app
-bp = Blueprint('czd-api', __name__,
-               template_folder='templates')
-
 app = Flask(__name__)
-app.register_blueprint(bp, url_prefix='/api')
-
+app.config.from_object(AppConfig)
+app.register_blueprint(api_blueprint)
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
 
 
-@bp.before_request
-def log_request_info():
-    app.logger.debug('Headers: %s', request.headers)
-    app.logger.debug('Body: %s', request.get_data())
+@app.before_request
+def watcher():
+    log_request_info()
 
 
-@bp.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify(message='pong!')
+@app.route('/sitemap', methods=['GET'])
+def sitemap():
+    return jsonify(list_routes())
 
 
-@bp.route('/puzzle', methods=['POST'])
-def puzzle():
-    f = request.files['file']
-    name = secure_filename(f.filename)
-    ext = name.split('.')[1]
-    encoded_image = ("data:image/%s;base64," %
-                     ext) + base64.b64encode(f.read())
+@app.errorhandler(404)
+def page_not_found(error):
+    app.logger.error(error)
+    return jsonify(error=404, message=str(error)), 404
 
-    parts = process_image(encoded_image)
-    images = [(("data:image/%s;base64," % ext) + base64.b64encode(item))
-              for item in parts]
 
-    return jsonify(
-        ext=ext,
-        original=encoded_image,
-        images=images
-    )
+@app.errorhandler(500)
+def server_error(error):
+    app.logger.error(error)
+    return jsonify(error=500, message=str(error)), 500
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5050)
+    app.run()

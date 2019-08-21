@@ -14,7 +14,7 @@ module.exports = (env) => {
       contentBase: './dist',
       historyApiFallback: true,
       proxy: {
-        '/api': 'http://localhost:5050'
+        '/api': 'http://localhost:5000'
       }
     },
     module: {

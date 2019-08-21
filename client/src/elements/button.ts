@@ -72,9 +72,20 @@ class Button extends LitElement {
         type="${this.type}"
         class="${btnClass}"
         ?disabled=${this.disabled}
+        @click=${this.onClick}
       >
         <slot></slot>
       </button>
     `;
+  }
+
+  private onClick() {
+    const e = new CustomEvent('onClick', {
+      bubbles: true,
+      composed: true,
+      detail: null
+    });
+
+    this.dispatchEvent(e);
   }
 }

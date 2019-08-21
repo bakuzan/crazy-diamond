@@ -43,7 +43,9 @@ class Home extends LitElement {
           />
         </div>
 
-        <czd-button type="submit" primary>Submit</czd-button>
+        <czd-button type="submit" primary @onClick=${this.onSubmit}
+          >Submit</czd-button
+        >
       </form>
     `;
   }
@@ -57,7 +59,7 @@ class Home extends LitElement {
 
   private async onSubmit(event: Event) {
     event.preventDefault();
-
+    console.log('submit', this.file);
     if (!this.file) {
       // TODO
       // File is required!
