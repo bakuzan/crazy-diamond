@@ -5,12 +5,13 @@ import math
 import numpy as np
 
 
-def crop(image, rows, columns):
+def crop(ext, image, rows, columns):
+    ext = str("." + ext).replace("..", ".")
     img = image
     ogImg = image
     height, width = image.shape[:2]
     results = []
-
+    print("start loooooooooooooop")
     for ih in range(rows):
         for iw in range(columns):
 
@@ -19,9 +20,10 @@ def crop(image, rows, columns):
             h = math.floor(height / rows)
             w = math.floor(width / columns)
             print(x, y, h, w)
-            img = img[y: y+h, x: x+w]
+            crop_img = img[y: y+h, x: x+w].copy()
+            _, buff = cv2.imencode(ext, crop_img)
 
-            results.append(img)
+            results.append(buff)
             img = ogImg
 
     return results
@@ -34,10 +36,10 @@ def base64_to_cv2(encoded_image):
     return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
 
-def process_image(encoded_image):
+def process_image(encoded_image, ext):
     image = base64_to_cv2(encoded_image)
 
     CROP_H_SIZE = 3
     CROP_W_SIZE = 3
     print("crop start!")
-    return crop(image, CROP_H_SIZE, CROP_W_SIZE), image
+    return crop(ext, image, CROP_H_SIZE, CROP_W_SIZE)
