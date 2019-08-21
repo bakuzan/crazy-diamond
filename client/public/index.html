@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Crazy Diamond is image puzzle solver." />
+    <meta name="theme-color" content="#e87c7c" />
+
+    <link
+      rel="icon"
+      type="image/png"
+      href="%PUBLIC_URL%favicon-32x32.png"
+      sizes="32x32"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="%PUBLIC_URL%favicon-16x16.png"
+      sizes="16x16"
+    />
+
+    <title>Crazy Diamond</title>
+
+    <style>
+      :root {
+        --font-size: 16px;
+        --font-family: 'Lucida Console', 'Courier New', monospace;
+        --success-colour: #228b22;
+        --danger-colour: #b22222;
+        --disabled-colour: #bbbbbb;
+
+        --primary-colour: #e87c7c;
+        --primary-colour-hovered: #e24f4f;
+        --primary-contrast: #000;
+
+        --secondary-colour: #96cecb;
+        --secondary-colour-hovered: #73beba;
+        --secondary-contrast: #000;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        overflow-y: auto;
+      }
+      body,
+      button {
+        font-family: var(--font-family);
+        font-size: var(--font-size);
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <strong
+        >We're sorry but Galko doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong
+      >
+    </noscript>
+    <czd-router-view></czd-router-view>
+  </body>
+</html>
