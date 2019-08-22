@@ -48,7 +48,7 @@ class Router {
     if (!toRoute) {
       // TODO
       // Handle unknown route ??
-      console.error('Unknown route');
+      console.error('Unknown route', routeUrl);
       return;
     }
 
@@ -62,26 +62,13 @@ class Router {
     this.publishChange(toRoute, fromRoute);
   }
 
-  public query(search: string) {
-    const toRoute = this.currentRoute;
-
-    if (!toRoute) {
-      // TODO
-      // Handle unknown route ??
-      console.error('Unknown route');
-      return;
-    }
-
-    const targetUrl = `${toRoute.url}?${search}`;
-    window.history.replaceState(null, '', targetUrl);
-  }
-
   public guardPath(path: string) {
     if (!path) {
       return this.baseUrl;
     }
-
-    let p = path.replace(/\/\//g, '/');
+    console.log(path, path.split('?')[0]);
+    let p = path.split('?')[0];
+    p = p.replace(/\/\//g, '/');
     p = p.startsWith('/') ? p : `/${p}`;
     p = p.endsWith('/') ? p.slice(0, -1) : p;
     return p || this.baseUrl;
@@ -97,7 +84,7 @@ class Router {
       if (!toRoute) {
         // TODO
         // Handle unknown route ??
-        console.error('Unknown route');
+        console.error('Unknown route', path);
         return;
       }
 

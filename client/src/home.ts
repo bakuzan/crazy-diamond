@@ -1,9 +1,10 @@
 import '@/elements/button';
 import floatLabel from '@/styles/floatLabel';
 import query from '@/utils/query';
-import store from '@/utils/store';
+import { store } from '@/utils/storage';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import router from './router';
+import generateUniqueId from './utils/generateUniqueId';
 
 @customElement('czd-home')
 class Home extends LitElement {
@@ -86,8 +87,10 @@ class Home extends LitElement {
 
     console.log(response);
     if (response.success) {
-      store.set(response.data);
-      router.push('/puzzle');
+      const uid = generateUniqueId();
+
+      store.set({ [uid]: response.data });
+      router.push(`/puzzle?key=${uid}`);
     } else {
       // TODO
       // Handle error

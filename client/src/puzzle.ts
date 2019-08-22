@@ -1,18 +1,13 @@
 import '@/elements/router-link';
 import '@/elements/tile';
+import { PuzzleState } from '@/interfaces/PuzzleState';
 import router from '@/router';
 import constructObjectFromSearchParams from '@/utils/constructObjectFromSearchParams';
 import query from '@/utils/query';
-import store from '@/utils/store';
+import { store } from '@/utils/storage';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import temp_data from './temp__data';
 import shuffleArray from './utils/shuffleArray';
-
-interface PuzzleState {
-  ext: string;
-  original: string;
-  images: string[];
-}
 
 interface Tile {
   id: number;
@@ -81,15 +76,15 @@ class Puzzle extends LitElement {
   private message: string = '';
 
   public async firstUpdated() {
+    const state = store.get();
     const search = window.location.search;
-    const puzzle = store.get();
-
+    const params = constructObjectFromSearchParams(search);
+    const puzzle = state[params.key];
+    console.log(state, params);
     if (puzzle) {
       const data = puzzle as PuzzleState;
-      const urlSafeImage = encodeURIComponent(data.original.split(',')[1]);
 
       this.setPuzzleData(data);
-      router.query(`ext=${data.ext}&data=${urlSafeImage}`);
       console.log('puzzle', puzzle);
     } else if (search) {
       this.fetchPuzzle(search);
@@ -104,8 +99,11 @@ class Puzzle extends LitElement {
       // Improve this
       return html`
         <div>
-          We couldn't find an image to create a puzzle with. Upload one on the
-          homepage.
+          <h1>No image found</h1>
+          <p style="white-space:pre-line;">
+            ${`We couldn't find an image to create a puzzle with.
+            Upload one on the homepage.`}
+          </p>
           <div>
             <czd-router-link .href="${router.base}"
               >Return to Home</czd-router-link
@@ -198,15 +196,19 @@ class Puzzle extends LitElement {
     // this.setPuzzleData(data as PuzzleState);
     // return;
 
-    const state = constructObjectFromSearchParams(search);
+    // TODO
+    // We will save these to a DB rather than localStorage
+    // Then query for them!
 
-    if (state.data) {
-      const response = await query(`/puzzle${search}`);
+    // const state = constructObjectFromSearchParams(search);
 
-      if (response.success) {
-        this.setPuzzleData(response.data as PuzzleState);
-      }
-    }
+    // if (state.data) {
+    //   const response = await query(`/puzzle${search}`);
+
+    //   if (response.success) {
+    //     this.setPuzzleData(response.data as PuzzleState);
+    //   }
+    // }
 
     if (!this.puzzle) {
       this.noPuzzle = true;

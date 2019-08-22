@@ -20,6 +20,7 @@ export default async function fetchFromServer(
       method: 'GET',
       ...opts
     });
+
     const data = await response.json();
 
     return { success: true, data, errorMessage: null };

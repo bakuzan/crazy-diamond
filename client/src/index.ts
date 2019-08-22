@@ -56,7 +56,9 @@ class RouterView extends LitElement {
     }
 
     return html`
-      <nav class="action-bar"></nav>
+      <nav class="action-bar">
+        <czd-router-link nav .href=${router.base}>Home</czd-router-link>
+      </nav>
       <main>
         ${route.render(this.routeKey)}
       </main>

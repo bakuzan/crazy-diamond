@@ -30,6 +30,14 @@ class RouterLink extends LitElement {
       .router-link--primary:hover {
         background-color: var(--primary-colour-hovered);
       }
+      .router-link--nav {
+        text-decoration: none;
+        font-size: 1.25rem;
+        color: var(--secondary-colour);
+      }
+      .router-link--nav:hover {
+        color: var(--secondary-colour-hovered);
+      }
     `;
   }
 
@@ -42,12 +50,16 @@ class RouterLink extends LitElement {
   @property({ type: Boolean })
   public primary: boolean = false;
 
+  @property({ type: Boolean })
+  public nav: boolean = false;
+
   public render() {
     const href = this.resolveLocation();
     const cx = [
       `router-link`,
       this.buttonise && 'router-link--as-button',
-      this.buttonise && this.primary && 'router-link--primary'
+      this.buttonise && this.primary && 'router-link--primary',
+      this.nav && 'router-link--nav'
     ]
       .filter((x) => !!x)
       .join(' ');

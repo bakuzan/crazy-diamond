@@ -1,7 +1,7 @@
 {
   "name": "crazy-diamond",
   "version": "1.0.0",
-  "description": "Crazy Diamond is an image solving puzzle game",
+  "description": "Crazy Diamond is an image sliding puzzle game.",
   "homepage": "https://github.com/bakuzan/crazy-diamond#readme",
   "private": true,
   "main": "dist/index.html",

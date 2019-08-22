@@ -26,7 +26,7 @@ def get_puzzle():
     prefix = ("data:image/%s;base64," % ext)
     print('PRE ENC')
     encoded_image = prefix + base64_url_decode(data)
-    print('POST ENC')
+    print('POST ENC', encoded_image)
     parts = process_image(encoded_image, ext)
 
     log_info('got parts')

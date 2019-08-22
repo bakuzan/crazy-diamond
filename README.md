@@ -1,6 +1,6 @@
 # Crazy Diamond
 
-Crazy Diamond is an image solving puzzle game.
+Crazy Diamond is an image sliding puzzle game.
 
 Work in progress.
 
