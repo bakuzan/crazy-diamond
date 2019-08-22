@@ -8,18 +8,27 @@ class RouterLink extends LitElement {
   static get styles() {
     return css`
       .router-link--as-button {
+        display: block;
         text-decoration: none;
-        color: inherit;
         font-family: var(--font-family);
-        font-size: inherit;
+        font-size: var(--font-size);
         background: none;
         border: none;
+        box-shadow: 1px 1px 2px 0px var(--shadow-colour),
+          0px 0px 1px 0px var(--shadow-colour);
         padding: 5px 10px;
         margin: 0 2px;
         cursor: pointer;
       }
       .router-link--as-button:hover {
-        color: var(--secondary-colour-hovered);
+        background-color: hsl(0, 0%, 95%);
+      }
+      .router-link--primary {
+        background-color: var(--primary-colour);
+        color: var(--secondary-contrast);
+      }
+      .router-link--primary:hover {
+        background-color: var(--primary-colour-hovered);
       }
     `;
   }
@@ -30,9 +39,18 @@ class RouterLink extends LitElement {
   @property({ type: Boolean })
   public buttonise: boolean = false;
 
+  @property({ type: Boolean })
+  public primary: boolean = false;
+
   public render() {
-    const cx = `router-link${this.buttonise ? ' router-link--as-button' : ''}`;
     const href = this.resolveLocation();
+    const cx = [
+      `router-link`,
+      this.buttonise && 'router-link--as-button',
+      this.buttonise && this.primary && 'router-link--primary'
+    ]
+      .filter((x) => !!x)
+      .join(' ');
 
     return html`
       <a class="${cx}" href="${href}" @click=${this.handleClick}>

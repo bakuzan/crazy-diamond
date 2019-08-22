@@ -9,6 +9,14 @@ class Tile extends LitElement {
         justify-content: center;
         align-items: center;
       }
+      .tile__button {
+        background: none;
+        padding: 0;
+        border: none;
+      }
+      .tile__button:not([disabled]) {
+        cursor: pointer;
+      }
       .image {
       }
       .image--hidden {
@@ -24,17 +32,29 @@ class Tile extends LitElement {
   public image!: string;
 
   @property({ type: Boolean })
-  public hidden: boolean = false;
+  public isHidden: boolean = false;
 
   public render() {
-    const classes = ['image', this.hidden && 'image--hidden']
+    const classes = ['image', this.isHidden && 'image--hidden']
       .filter((x) => !!x)
       .join(' ');
 
     return html`
       <div class="tile">
-        <img class="${classes}" src="${this.image}" alt="Tile ${this.key}" />
+        <button
+          class="tile__button"
+          type="button"
+          ?disabled=${this.isHidden}
+          @click=${this.onClick}
+        >
+          <img class="${classes}" src="${this.image}" alt="Tile ${this.key}" />
+        </button>
       </div>
     `;
+  }
+
+  private onClick() {
+    const event = new CustomEvent('select', { detail: this.key });
+    this.dispatchEvent(event);
   }
 }

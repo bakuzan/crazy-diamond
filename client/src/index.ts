@@ -10,11 +10,22 @@ class RouterView extends LitElement {
     return css`
       :host,
       main {
-        min-height: calc(100vh - 10px);
+        --action-bar-height: 51px;
+        min-height: calc(100vh - 10px - var(--action-bar-height));
       }
 
       main {
         padding: 5px;
+      }
+
+      .action-bar {
+        display: flex;
+        align-items: center;
+        background-color: var(--primary-colour);
+        min-height: var(--action-bar-height);
+        padding: 10px 15px;
+        box-shadow: 1px 1px 2px 2px var(--shadow-colour);
+        box-sizing: border-box;
       }
     `;
   }
@@ -27,23 +38,28 @@ class RouterView extends LitElement {
   }
 
   public render() {
-    const route = router.currentRoute;
+    let route = router.currentRoute;
 
     if (!route) {
-      return html`
-        <main>
+      route = {
+        name: '404',
+        render: () => html`
           <h1>We couldn't find what you were looking for.</h1>
           <div>
             <czd-router-link .href=${router.base}
               >Return to Home</czd-router-link
             >
           </div>
-        </main>
-      `;
+        `,
+        url: ''
+      };
     }
 
     return html`
-      <main>${route.render(this.routeKey)}</main>
+      <nav class="action-bar"></nav>
+      <main>
+        ${route.render(this.routeKey)}
+      </main>
     `;
   }
 }

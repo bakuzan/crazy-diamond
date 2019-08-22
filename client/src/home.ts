@@ -16,6 +16,14 @@ class Home extends LitElement {
           flex-direction: column;
           margin-bottom: 10px;
         }
+        .control__input.control__input {
+          padding-bottom: 5px;
+        }
+
+        .form {
+          min-width: 400px;
+          max-width: 50%;
+        }
       `
     ];
   }
