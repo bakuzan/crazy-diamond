@@ -64,8 +64,8 @@ module.exports = (env) => {
       new CleanWebpackPlugin(),
       new HtmlWebpackPlugin({
         inject: 'head',
-        template: 'public/index.html'
-        // favicon: 'public/favicon.ico'
+        template: 'public/index.html',
+        favicon: 'public/favicon.ico'
       })
     ]
   };

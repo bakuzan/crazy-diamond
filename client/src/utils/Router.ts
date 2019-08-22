@@ -62,6 +62,20 @@ class Router {
     this.publishChange(toRoute, fromRoute);
   }
 
+  public query(search: string) {
+    const toRoute = this.currentRoute;
+
+    if (!toRoute) {
+      // TODO
+      // Handle unknown route ??
+      console.error('Unknown route');
+      return;
+    }
+
+    const targetUrl = `${toRoute.url}?${search}`;
+    window.history.replaceState(null, '', targetUrl);
+  }
+
   public guardPath(path: string) {
     if (!path) {
       return this.baseUrl;

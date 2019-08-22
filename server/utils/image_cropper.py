@@ -11,7 +11,7 @@ def crop(ext, image, rows, columns):
     ogImg = image
     height, width = image.shape[:2]
     results = []
-    print("start loooooooooooooop")
+
     for ih in range(rows):
         for iw in range(columns):
 

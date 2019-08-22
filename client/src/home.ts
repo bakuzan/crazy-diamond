@@ -1,7 +1,9 @@
 import '@/elements/button';
 import floatLabel from '@/styles/floatLabel';
 import query from '@/utils/query';
+import store from '@/utils/store';
 import { css, customElement, html, LitElement, property } from 'lit-element';
+import router from './router';
 
 @customElement('czd-home')
 class Home extends LitElement {
@@ -75,7 +77,12 @@ class Home extends LitElement {
     });
 
     console.log(response);
-    // TODO
-    // Redirect to /puzzle
+    if (response.success) {
+      store.set(response.data);
+      router.push('/puzzle');
+    } else {
+      // TODO
+      // Handle error
+    }
   }
 }
