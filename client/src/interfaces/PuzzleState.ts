@@ -1,5 +1,6 @@
+import { Tile } from './Tile';
+
 export interface PuzzleState {
-  ext: string;
   original: string;
-  images: string[];
+  tiles: Tile[];
 }

@@ -1,10 +1,11 @@
+from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
-from app import db
+from database.index import db
 
 class Puzzle(db.Model):
     __tablename__ = 'puzzle'
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     image = db.Column(db.String())
 
     def __init__(self, image):
@@ -23,7 +24,7 @@ class Tile(db.Model):
     __tablename__ = 'tile'
 
     id = db.Column(db.Integer, primary_key=True)
-    puzzle_id = db.Column(db.ForeignKey("puzzle.id"))
+    puzzle_id = db.Column(db.ForeignKey("puzzle.id"), nullable=False)
     position = db.Column(db.Integer)
     image = db.Column(db.String())
 

@@ -4,8 +4,8 @@ import base64
 import numpy as np
 import re
 
-from app import db
-from db.models import Puzzle, Tile
+from database.index import db
+from database.models import Puzzle, Tile
 from utils.logger import log_info
 from utils.base64_helpers import base64_url_decode
 from utils.image_cropper import process_image
@@ -25,11 +25,11 @@ def get_puzzle(id_):
     try:
         puzzle = Puzzle.query.filter_by(id=id_).first()
         tiles = Tile.query.filter_by(puzzle_id=puzzle.id)
-        tiles = [t.serialise() for t in tiles]
+        tiles = [t.serialize() for t in tiles]
 
         return jsonify(
             success=True,
-            original=puzzle.serialise(),
+            original=puzzle.serialize(),
             tiles=tiles
         )
     except Exception as e:
@@ -52,18 +52,18 @@ def post_puzzle():
     try:
         puzzle = Puzzle(image=encoded_image)
         db.session.add(puzzle)
-        
+        db.session.commit()
 
-        for (img, index) in images:
+        for idx, img in enumerate(images):
             tile = Tile(
                 puzzle_id=puzzle.id,
-                position=index,
+                position=idx,
                 image= img
             )
 
             db.session.add(tile)
 
         db.session.commit()
-        return jsonify(message="Puzzle successfully saved.")
+        return jsonify(success=True, message=puzzle.id)
     except Exception as e:
-	    return jsonify(message=str(e))
+	    return jsonify(success=False, message=str(e))

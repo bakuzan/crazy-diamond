@@ -23,7 +23,7 @@ export default async function fetchFromServer(
 
     const data = await response.json();
 
-    return { success: true, data, errorMessage: null };
+    return data;
   } catch (error) {
     const errorMessage = error.message as string;
 

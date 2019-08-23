@@ -6,13 +6,9 @@ import constructObjectFromSearchParams from '@/utils/constructObjectFromSearchPa
 import query from '@/utils/query';
 import { store } from '@/utils/storage';
 import { css, customElement, html, LitElement, property } from 'lit-element';
+import { Tile } from './interfaces/Tile';
 import temp_data from './temp__data';
 import shuffleArray from './utils/shuffleArray';
-
-interface Tile {
-  id: number;
-  img: string;
-}
 
 const LAST_TILE = 8;
 
@@ -77,18 +73,12 @@ class Puzzle extends LitElement {
   private message: string = '';
 
   public async firstUpdated() {
-    const state = store.get();
     const search = window.location.search;
     const params = constructObjectFromSearchParams(search);
-    const puzzle = state[params.key];
-    console.log(state, params);
-    if (puzzle) {
-      const data = puzzle as PuzzleState;
-
-      this.setPuzzleData(data);
-      console.log('puzzle', puzzle);
-    } else if (search) {
-      this.fetchPuzzle(search);
+    const puzzleId = params.key;
+    console.log(params);
+    if (puzzleId) {
+      this.fetchPuzzle(puzzleId);
     } else {
       this.noPuzzle = true;
     }
@@ -144,9 +134,9 @@ class Puzzle extends LitElement {
                   (item) =>
                     html`
                       <czd-tile
-                        .key=${item.id}
-                        .image=${item.img}
-                        ?isHidden=${item.id === LAST_TILE}
+                        .key=${item.position}
+                        .image=${item.image}
+                        ?isHidden=${item.position === LAST_TILE}
                         @select=${this.handleSelect}
                       ></czd-tile>
                     `
@@ -162,8 +152,8 @@ class Puzzle extends LitElement {
 
   private handleSelect(event: CustomEvent) {
     const key = event.detail as number;
-    const empty = this.tiles.findIndex((x) => x.id === LAST_TILE);
-    const pos = this.tiles.findIndex((x) => x.id === key);
+    const empty = this.tiles.findIndex((x) => x.position === LAST_TILE);
+    const pos = this.tiles.findIndex((x) => x.position === key);
     console.log(`from: ${pos}, to: ${empty} ??`);
 
     const inCol = empty % 3 === pos % 3;
@@ -185,7 +175,7 @@ class Puzzle extends LitElement {
   }
 
   private validatePositions() {
-    this.isSolved = this.tiles.every((x, i) => x.id === i);
+    this.isSolved = this.tiles.every((x, i) => x.position === i);
   }
 
   private resetPuzzle() {
@@ -193,23 +183,25 @@ class Puzzle extends LitElement {
     this.setPuzzleData(this.puzzle as PuzzleState);
   }
 
-  private async fetchPuzzle(search: string) {
+  private async fetchPuzzle(puzzleId: string) {
     // this.setPuzzleData(data as PuzzleState);
     // return;
 
-    // TODO
-    // We will save these to a DB rather than localStorage
-    // Then query for them!
+    if (puzzleId) {
+      const response = await query(`/puzzle/${puzzleId}`);
 
-    // const state = constructObjectFromSearchParams(search);
+      if (response.success) {
+        const puzzle: PuzzleState = {
+          original: response.original.image,
+          tiles: response.tiles.map((x: any) => ({
+            image: x.image,
+            position: x.position
+          }))
+        };
 
-    // if (state.data) {
-    //   const response = await query(`/puzzle${search}`);
-
-    //   if (response.success) {
-    //     this.setPuzzleData(response.data as PuzzleState);
-    //   }
-    // }
+        this.setPuzzleData(puzzle as PuzzleState);
+      }
+    }
 
     if (!this.puzzle) {
       this.noPuzzle = true;
@@ -219,8 +211,6 @@ class Puzzle extends LitElement {
   private setPuzzleData(puzzle: PuzzleState) {
     this.puzzle = puzzle;
 
-    this.tiles = shuffleArray<Tile>(
-      puzzle.images.map((img, id) => ({ id, img }))
-    );
+    this.tiles = shuffleArray<Tile>(puzzle.tiles);
   }
 }

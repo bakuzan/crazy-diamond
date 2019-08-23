@@ -87,9 +87,7 @@ class Home extends LitElement {
 
     console.log(response);
     if (response.success) {
-      const uid = generateUniqueId();
-
-      store.set({ [uid]: response.data });
+      const uid = response.message;
       router.push(`/puzzle?key=${uid}`);
     } else {
       // TODO
