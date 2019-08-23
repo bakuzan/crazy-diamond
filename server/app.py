@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint, jsonify
+from flask import Flask, Blueprint, jsonify, render_template
 from flask_cors import CORS
 from dotenv import load_dotenv
 from os.path import abspath, join, dirname
@@ -11,12 +11,12 @@ from api.index import api_blueprint
 
 
 if "IS_PRODUCTION" not in os.environ:
-    dotenv_path = abspath(join(dirname(__file__), '.env'))
+    dotenv_path = abspath(join(dirname(__file__), '..', '.env'))
     load_dotenv(dotenv_path)
 
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='', static_folder="../client/dist", template_folder="../client/dist")
     app.config.from_object(os.environ['APP_SETTINGS'])
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.register_blueprint(api_blueprint)
@@ -30,6 +30,9 @@ def setup_app_routes(app):
     def watcher():
         log_request_info()
 
+    @app.route("/")
+    def index():
+        return render_template("index.html")
 
     @app.route('/sitemap', methods=['GET'])
     def sitemap():
