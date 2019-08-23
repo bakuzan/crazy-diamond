@@ -1,16 +1,22 @@
 from flask import Flask, Blueprint, jsonify
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+import os
 
-from config import AppConfig
-from request_middleware import log_request_info
-from route_list import list_routes
+from utils.request_middleware import log_request_info
+from utils.route_list import list_routes
 from api.index import api_blueprint
 
 
 # instantiate the app
 app = Flask(__name__)
-app.config.from_object(AppConfig)
+app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.register_blueprint(api_blueprint)
+
+# Muh db
+db = SQLAlchemy(app)
+
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})

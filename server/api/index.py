@@ -4,6 +4,8 @@ import base64
 import numpy as np
 import re
 
+from app import db
+from db.models import Puzzle, Tile
 from utils.logger import log_info
 from utils.base64_helpers import base64_url_decode
 from utils.image_cropper import process_image
@@ -18,26 +20,20 @@ def ping_pong():
     return jsonify(message='pong!')
 
 
-@api_blueprint.route('/puzzle', methods=['GET'])
-def get_puzzle():
-    print('GET THE PUZZLE')
-    data = request.args.get('data')
-    ext = request.args.get('ext')
-    prefix = ("data:image/%s;base64," % ext)
-    print('PRE ENC')
-    encoded_image = prefix + base64_url_decode(data)
-    print('POST ENC', encoded_image)
-    parts = process_image(encoded_image, ext)
+@api_blueprint.route('/puzzle/<id_>', methods=['GET'])
+def get_puzzle(id_):
+    try:
+        puzzle = Puzzle.query.filter_by(id=id_).first()
+        tiles = Tile.query.filter_by(puzzle_id=puzzle.id)
+        tiles = [t.serialise() for t in tiles]
 
-    log_info('got parts')
-    images = [(prefix + base64.b64encode(d).decode()) for d in parts]
-    log_info("got images")
-    
-    return jsonify(
-        ext=ext,
-        original=encoded_image,
-        images=images
-    )
+        return jsonify(
+            success=True,
+            original=puzzle.serialise(),
+            tiles=tiles
+        )
+    except Exception as e:
+	    return jsonify(success=False, message=str(e))
 
 
 @api_blueprint.route('/puzzle', methods=['POST'])
@@ -53,8 +49,21 @@ def post_puzzle():
     images = [(prefix + base64.b64encode(d).decode()) for d in parts]
     log_info("got images")
     
-    return jsonify(
-        ext=ext,
-        original=encoded_image,
-        images=images
-    )
+    try:
+        puzzle = Puzzle(image=encoded_image)
+        db.session.add(puzzle)
+        
+
+        for (img, index) in images:
+            tile = Tile(
+                puzzle_id=puzzle.id,
+                position=index,
+                image= img
+            )
+
+            db.session.add(tile)
+
+        db.session.commit()
+        return jsonify(message="Puzzle successfully saved.")
+    except Exception as e:
+	    return jsonify(message=str(e))

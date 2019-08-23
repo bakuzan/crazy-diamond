@@ -10,6 +10,7 @@ class Tile extends LitElement {
         align-items: center;
       }
       .tile__button {
+        display: flex;
         background: none;
         padding: 0;
         border: none;

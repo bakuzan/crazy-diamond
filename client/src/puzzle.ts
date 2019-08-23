@@ -30,8 +30,9 @@ class Puzzle extends LitElement {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-auto-rows: 1fr;
-        grid-gap: 1px;
+        grid-gap: 2px;
         background-color: var(--secondary-colour);
+        padding: 2px;
         box-shadow: 1px 1px 2px 0px var(--primary-colour),
           0px 0px 1px 0px var(--primary-colour);
         margin: auto;
