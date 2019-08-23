@@ -4,10 +4,8 @@ import { PuzzleState } from '@/interfaces/PuzzleState';
 import router from '@/router';
 import constructObjectFromSearchParams from '@/utils/constructObjectFromSearchParams';
 import query from '@/utils/query';
-import { store } from '@/utils/storage';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import { Tile } from './interfaces/Tile';
-import temp_data from './temp__data';
 import shuffleArray from './utils/shuffleArray';
 
 const LAST_TILE = 8;

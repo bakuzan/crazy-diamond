@@ -1,10 +1,8 @@
 import '@/elements/button';
 import floatLabel from '@/styles/floatLabel';
 import query from '@/utils/query';
-import { store } from '@/utils/storage';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import router from './router';
-import generateUniqueId from './utils/generateUniqueId';
 
 @customElement('czd-home')
 class Home extends LitElement {
