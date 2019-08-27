@@ -29,6 +29,24 @@ def crop(ext, image, rows, columns):
     return results
 
 
+def make_image_square(image):
+    height, width = image.shape[:2]
+
+    if height == width:
+        return image
+
+    size = min(height, width)
+    diff = abs(height - width)
+    deltas = [math.floor(diff/2), math.floor(diff/2)]
+    top, bottom, left, right = [0] * 4
+
+    if size == height:
+        top, bottom = deltas
+    elif size == width:
+        left, right = deltas
+
+    return cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_REPLICATE)
+
 def base64_to_cv2(encoded_image):
     encoded_data = encoded_image.split(',')[1]
     d = base64.b64decode(encoded_data)
@@ -41,5 +59,6 @@ def process_image(encoded_image, ext):
 
     CROP_H_SIZE = 3
     CROP_W_SIZE = 3
-    print("crop start!")
-    return crop(ext, image, CROP_H_SIZE, CROP_W_SIZE)
+    
+    squared_image = make_image_square(image)
+    return crop(ext, squared_image, CROP_H_SIZE, CROP_W_SIZE)
