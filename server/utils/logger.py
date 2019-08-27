@@ -13,3 +13,6 @@ logger = logging.getLogger(name="CZD")
 
 def log_info(inp):
     logger.info(inp.encode('utf-8'))
+
+def log_error(inp):
+    logger.error(inp.encode('utf-8'))

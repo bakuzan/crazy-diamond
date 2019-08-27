@@ -83,6 +83,6 @@ class RouterLink extends LitElement {
       ? this.href
       : `${router.base}${this.href}`;
 
-    return router.guardPath(href);
+    return router.guardPath(href, false);
   }
 }

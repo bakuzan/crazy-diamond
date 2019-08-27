@@ -5,8 +5,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     CSRF_ENABLED = True
-    EXPLAIN_TEMPLATE_LOADING = os.environ['EXPLAIN_TEMPLATE_LOADING']
-    SECRET_KEY = 'this-really-needs-to-be-changed'
+    EXPLAIN_TEMPLATE_LOADING = os.environ.get('EXPLAIN_TEMPLATE_LOADING', False)
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 

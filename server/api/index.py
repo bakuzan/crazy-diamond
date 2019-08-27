@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from  sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
 import base64
 import numpy as np
@@ -6,7 +7,7 @@ import re
 
 from database.index import db
 from database.models import Puzzle, Tile
-from utils.logger import log_info
+from utils.logger import log_info, log_error
 from utils.base64_helpers import base64_url_decode
 from utils.image_cropper import process_image
 
@@ -67,3 +68,21 @@ def post_puzzle():
         return jsonify(success=True, message=puzzle.id)
     except Exception as e:
 	    return jsonify(success=False, message=str(e))
+
+@api_blueprint.route('/random-puzzle', methods=['GET'])
+def get_random_puzzle():
+    try:
+        puzzle = Puzzle.query.order_by(func.random()).first()
+
+        return jsonify(
+            success=True,
+            message=puzzle.id
+        )
+    except Exception as e:
+	    return jsonify(success=False, message=str(e))
+
+
+@api_blueprint.errorhandler(404)
+def page_not_found(error):
+    log_error(error)
+    return jsonify(error=404, message=str(error)), 404

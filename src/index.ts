@@ -2,6 +2,7 @@ import '@/elements/router-link';
 import '@/home';
 import '@/puzzle';
 import { css, customElement, html, LitElement, property } from 'lit-element';
+import query from '@/utils/query';
 import router from './router';
 
 @customElement('czd-router-view')
@@ -27,14 +28,23 @@ class RouterView extends LitElement {
         box-shadow: 1px 1px 2px 2px var(--shadow-colour);
         box-sizing: border-box;
       }
+
+      .flex-spacer {
+        display: flex;
+        flex: 1;
+      }
     `;
   }
 
   @property({ type: String })
   private routeKey: string = '';
 
+  @property({ type: String })
+  private randomId: string = '';
+
   public firstUpdated() {
     router.subscribe(({ key }) => (this.routeKey = key));
+    this.fetchRandomId();
   }
 
   public render() {
@@ -55,13 +65,35 @@ class RouterView extends LitElement {
       };
     }
 
+    const hasRandomId = !!this.randomId;
+    const randomUrl = `/puzzle?key=${this.randomId}`;
+
     return html`
       <nav class="action-bar">
         <czd-router-link nav .href=${router.base}>Home</czd-router-link>
+        <div class="flex-spacer"></div>
+        ${hasRandomId
+          ? html`
+              <czd-router-link
+                nav
+                .href=${randomUrl}
+                @click=${this.fetchRandomId}
+                >Random</czd-router-link
+              >
+            `
+          : ''}
       </nav>
       <main>
         ${route.render(this.routeKey)}
       </main>
     `;
+  }
+
+  private async fetchRandomId() {
+    const response = await query(`/random-puzzle`);
+
+    if (response.success) {
+      this.randomId = response.message;
+    }
   }
 }

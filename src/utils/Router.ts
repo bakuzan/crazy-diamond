@@ -62,12 +62,12 @@ class Router {
     this.publishChange(toRoute, fromRoute);
   }
 
-  public guardPath(path: string) {
+  public guardPath(path: string, stripQuery = true) {
     if (!path) {
       return this.baseUrl;
     }
-    console.log(path, path.split('?')[0]);
-    let p = path.split('?')[0];
+
+    let p = stripQuery ? path.split('?')[0] : path;
     p = p.replace(/\/\//g, '/');
     p = p.startsWith('/') ? p : `/${p}`;
     p = p.endsWith('/') ? p.slice(0, -1) : p;
