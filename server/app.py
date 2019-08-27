@@ -16,14 +16,18 @@ if "IS_PRODUCTION" not in os.environ:
 
 
 def create_app():
-    app = Flask(__name__, static_url_path='', static_folder="../dist", template_folder="../dist")
+    app = Flask(__name__,
+                static_url_path='',
+                static_folder="../dist",
+                template_folder="../dist")
     app.config.from_object(os.environ['APP_SETTINGS'])
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.register_blueprint(api_blueprint)
-    CORS(app, resources={r'/*': {'origins': '*'}})
+    CORS(app, resources={r'/api/*': {'origins': '*'}})
 
     db.init_app(app)
     return app
+
 
 def setup_app_routes(app):
     @app.before_request
@@ -34,13 +38,11 @@ def setup_app_routes(app):
     def sitemap():
         return jsonify(list_routes())
 
-
     @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def always_index(path):
-        app.logger.debug("always index > ", path)
+    @app.route('/<path>')
+    def catch_all(path):
+        app.logger.info("Catch all, Route > %s" % path)
         return render_template("index.html")
-
 
     @app.errorhandler(500)
     def server_error(error):

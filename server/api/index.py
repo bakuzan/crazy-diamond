@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-from  sqlalchemy.sql.expression import func
+from flask import Blueprint, request, jsonify, abort
+from sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
 import base64
 import numpy as np
@@ -34,7 +34,7 @@ def get_puzzle(id_):
             tiles=tiles
         )
     except Exception as e:
-	    return jsonify(success=False, message=str(e))
+        return jsonify(success=False, message=str(e))
 
 
 @api_blueprint.route('/puzzle', methods=['POST'])
@@ -45,11 +45,11 @@ def post_puzzle():
     prefix = ("data:image/%s;base64," % ext)
     encoded_image = prefix + base64.b64encode(f.read()).decode()
     parts = process_image(encoded_image, ext)
-    
+
     log_info('got parts')
     images = [(prefix + base64.b64encode(d).decode()) for d in parts]
     log_info("got images")
-    
+
     try:
         puzzle = Puzzle(image=encoded_image)
         db.session.add(puzzle)
@@ -59,7 +59,7 @@ def post_puzzle():
             tile = Tile(
                 puzzle_id=puzzle.id,
                 position=idx,
-                image= img
+                image=img
             )
 
             db.session.add(tile)
@@ -67,7 +67,8 @@ def post_puzzle():
         db.session.commit()
         return jsonify(success=True, message=puzzle.id)
     except Exception as e:
-	    return jsonify(success=False, message=str(e))
+        return jsonify(success=False, message=str(e))
+
 
 @api_blueprint.route('/random-puzzle', methods=['GET'])
 def get_random_puzzle():
@@ -79,10 +80,9 @@ def get_random_puzzle():
             message=puzzle.id
         )
     except Exception as e:
-	    return jsonify(success=False, message=str(e))
+        return jsonify(success=False, message=str(e))
 
 
 @api_blueprint.errorhandler(404)
-def page_not_found(error):
-    log_error(error)
-    return jsonify(error=404, message=str(error)), 404
+def api_not_found(error):
+    abort(404)

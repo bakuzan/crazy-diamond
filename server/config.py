@@ -14,14 +14,13 @@ class ProductionConfig(Config):
 
 
 class StagingConfig(Config):
-    DEVELOPMENT = True
+    ENV = "development"
     DEBUG = True
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = True
+    ENV = "development"
     DEBUG = True
-
 
 class TestingConfig(Config):
     TESTING = True
