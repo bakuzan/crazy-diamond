@@ -4,7 +4,7 @@ const path = require('path');
 
 module.exports = (env) => {
   const isDev = env.MODE === 'development';
-  const publicPath = '/';
+  const publicPath = isDev ? '/' : '/static';
 
   return {
     mode: env.MODE,

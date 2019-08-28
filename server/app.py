@@ -17,7 +17,7 @@ if "IS_PRODUCTION" not in os.environ:
 
 def create_app():
     app = Flask(__name__,
-                static_url_path='',
+                static_url_path="/static",
                 static_folder="../dist",
                 template_folder="../dist")
     app.config.from_object(os.environ['APP_SETTINGS'])

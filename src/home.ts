@@ -30,11 +30,6 @@ class Home extends LitElement {
   @property({ type: File })
   public file: File | undefined = undefined;
 
-  public async firstUpdated() {
-    const data = await query('/ping');
-    console.log(data);
-  }
-
   public render() {
     return html`
       <h1 class="page-title">Upload an image to get started</h1>
