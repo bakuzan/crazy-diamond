@@ -1,8 +1,8 @@
 import '@/elements/router-link';
 import '@/home';
 import '@/puzzle';
-import { css, customElement, html, LitElement, property } from 'lit-element';
 import query from '@/utils/query';
+import { css, customElement, html, LitElement, property } from 'lit-element';
 import router from './router';
 
 @customElement('czd-router-view')
