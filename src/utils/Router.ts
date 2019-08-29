@@ -38,6 +38,10 @@ class Router {
 
   public subscribe(fn: (update: RouteUpdate) => void) {
     this.listeners.push(fn);
+    return () => {
+      const index = this.listeners.indexOf(fn);
+      this.listeners.splice(index, 1);
+    };
   }
 
   public push(location: string) {

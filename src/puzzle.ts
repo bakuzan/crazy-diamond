@@ -70,15 +70,17 @@ class Puzzle extends LitElement {
   @property({ type: String })
   private message: string = '';
 
-  public async firstUpdated() {
-    const search = window.location.search;
-    const params = constructObjectFromSearchParams(search);
-    const puzzleId = params.key;
-    console.log(params);
-    if (puzzleId) {
-      this.fetchPuzzle(puzzleId);
-    } else {
-      this.noPuzzle = true;
+  @property({ type: Function })
+  private unsub!: () => void;
+
+  public firstUpdated() {
+    this.unsub = router.subscribe(() => this.initPuzzle());
+    this.initPuzzle();
+  }
+
+  public disconnectedCallback() {
+    if (this.unsub) {
+      this.unsub();
     }
   }
 
@@ -148,11 +150,22 @@ class Puzzle extends LitElement {
     `;
   }
 
+  private initPuzzle() {
+    const search = window.location.search;
+    const params = constructObjectFromSearchParams(search);
+    const puzzleId = params.key;
+
+    if (puzzleId) {
+      this.fetchPuzzle(puzzleId);
+    } else {
+      this.noPuzzle = true;
+    }
+  }
+
   private handleSelect(event: CustomEvent) {
     const key = event.detail as number;
     const empty = this.tiles.findIndex((x) => x.position === LAST_TILE);
     const pos = this.tiles.findIndex((x) => x.position === key);
-    console.log(`from: ${pos}, to: ${empty} ??`);
 
     const inCol = empty % 3 === pos % 3;
     const colAdjacent = Math.abs(empty - pos) === 3;
