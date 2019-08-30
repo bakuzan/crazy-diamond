@@ -277,7 +277,6 @@ class Puzzle extends LitElement {
   private setPuzzleData(puzzle: PuzzleState) {
     this.puzzle = puzzle;
     this.tiles = puzzle.tiles;
-    this.isSolved = true;
   }
 
   private async onDelete() {
