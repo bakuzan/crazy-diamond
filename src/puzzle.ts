@@ -1,3 +1,5 @@
+import '@/elements/button';
+import '@/elements/loading-bouncer';
 import '@/elements/router-link';
 import '@/elements/tile';
 import { PuzzleState } from '@/interfaces/PuzzleState';
@@ -6,7 +8,6 @@ import constructObjectFromSearchParams from '@/utils/constructObjectFromSearchPa
 import query from '@/utils/query';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import { Tile } from './interfaces/Tile';
-import shuffleArray from './utils/shuffleArray';
 
 const LAST_TILE = 8;
 
@@ -20,6 +21,18 @@ class Puzzle extends LitElement {
         flex-direction: column;
         width: 100%;
       }
+
+      .header {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+      }
+      .header__inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
       .tile-grid {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
@@ -67,8 +80,14 @@ class Puzzle extends LitElement {
   @property({ type: Boolean })
   private isSolved: boolean = false;
 
+  @property({ type: Boolean })
+  private isLoading: boolean = false;
+
   @property({ type: String })
   private message: string = '';
+
+  @property({ type: Number })
+  private loadingDebounce: number = 0;
 
   @property({ type: Function })
   private unsub!: () => void;
@@ -111,7 +130,21 @@ class Puzzle extends LitElement {
 
     return html`
       <div class="container">
-        <h1>${pageTitle}</h1>
+        <header class="header">
+          <div class="header__inner">
+            <h1>
+              ${pageTitle}
+            </h1>
+            <czd-button danger @onClick=${this.onDelete}
+              >Delete puzzle</czd-button
+            >
+          </div>
+          ${this.isLoading
+            ? html`
+                <czd-bouncer></czd-bouncer>
+              `
+            : ''}
+        </header>
         ${this.isSolved
           ? html`
               <div class="success-summary">
@@ -150,10 +183,14 @@ class Puzzle extends LitElement {
     `;
   }
 
-  private initPuzzle() {
+  private getPuzzleId() {
     const search = window.location.search;
     const params = constructObjectFromSearchParams(search);
-    const puzzleId = params.key;
+    return params.key;
+  }
+
+  private initPuzzle() {
+    const puzzleId = this.getPuzzleId();
 
     if (puzzleId) {
       this.fetchPuzzle(puzzleId);
@@ -189,9 +226,24 @@ class Puzzle extends LitElement {
     this.isSolved = this.tiles.every((x, i) => x.position === i);
   }
 
-  private resetPuzzle() {
-    this.isSolved = false;
-    this.setPuzzleData(this.puzzle as PuzzleState);
+  private async resetPuzzle() {
+    this.setLoading(true);
+
+    const size = 3;
+    const response = await query(`/puzzle-order/${size}`);
+
+    if (response.success) {
+      this.isSolved = false;
+
+      const puzzle = this.puzzle as PuzzleState;
+      this.tiles = response.tiles.map((position: number) =>
+        puzzle.tiles.find((x) => x.position === position)
+      );
+    } else {
+      this.message = 'Failed to reset the puzzle.';
+    }
+
+    this.setLoading(false);
   }
 
   private async fetchPuzzle(puzzleId: string) {
@@ -199,6 +251,7 @@ class Puzzle extends LitElement {
     // return;
 
     if (puzzleId) {
+      this.setLoading(true);
       const response = await query(`/puzzle/${puzzleId}`);
 
       if (response.success) {
@@ -212,6 +265,8 @@ class Puzzle extends LitElement {
 
         this.setPuzzleData(puzzle as PuzzleState);
       }
+
+      this.setLoading(false);
     }
 
     if (!this.puzzle) {
@@ -221,7 +276,35 @@ class Puzzle extends LitElement {
 
   private setPuzzleData(puzzle: PuzzleState) {
     this.puzzle = puzzle;
+    this.tiles = puzzle.tiles;
+    this.isSolved = true;
+  }
 
-    this.tiles = shuffleArray<Tile>(puzzle.tiles);
+  private async onDelete() {
+    const puzzleId = this.getPuzzleId();
+    if (puzzleId) {
+      this.setLoading(true);
+      const response = await query(`/puzzle/${puzzleId}`, { method: 'DELETE' });
+
+      if (response.success) {
+        router.push(router.base);
+      } else {
+        this.message = 'Failed to delete the puzzle';
+      }
+
+      this.setLoading(false);
+    }
+  }
+
+  private setLoading(value: boolean) {
+    clearTimeout(this.loadingDebounce);
+    if (!value) {
+      this.isLoading = false;
+    } else {
+      this.loadingDebounce = window.setTimeout(
+        () => (this.isLoading = true),
+        1100
+      );
+    }
   }
 }
