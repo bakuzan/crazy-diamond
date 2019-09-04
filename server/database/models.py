@@ -2,44 +2,27 @@ from uuid import uuid4
 from sqlalchemy.dialects.postgresql import UUID
 from database.index import db
 
+
 class Puzzle(db.Model):
     __tablename__ = 'puzzle'
 
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    image = db.Column(db.String())
+    image = db.Column(db.String(), nullable=False)
+    extension = db.Column(db.String(), nullable=False)
+    default_size = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, image):
+    def __init__(self, image, extension, default_size):
         self.image = image
+        self.extension = extension
+        self.default_size = default_size
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
-    
+
     def serialize(self):
         return {
-            'id': self.id, 
+            'id': self.id,
             'image': self.image,
-        }
-
-class Tile(db.Model):
-    __tablename__ = 'tile'
-
-    id = db.Column(db.Integer, primary_key=True)
-    puzzle_id = db.Column(db.ForeignKey("puzzle.id"), nullable=False)
-    position = db.Column(db.Integer)
-    image = db.Column(db.String())
-
-    def __init__(self, puzzle_id, position, image):
-        self.puzzle_id = puzzle_id
-        self.position = position
-        self.image = image
-
-    def __repr__(self):
-        return '<id {}>'.format(self.id)
-    
-    def serialize(self):
-        return {
-            'id': self.id, 
-            'puzzle_id': self.puzzle_id,
-            'position': self.position,
-            'image': self.image,
+            'extension': self.extension,
+            'defaultSize': self.default_size
         }

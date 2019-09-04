@@ -6,11 +6,12 @@ import numpy as np
 import re
 
 from database.index import db
-from database.models import Puzzle, Tile
+from database.models import Puzzle
+from models.Tile import Tile
 from utils.logger import log_info, log_error
 from utils.base64_helpers import base64_url_decode
 from utils.image_cropper import process_image
-from utils.solvable_puzzle import create_solvable_puzzle,create_solvable_order
+from utils.solvable_puzzle import create_solvable_puzzle, create_solvable_order
 
 # Create the api blueprint
 api_blueprint = Blueprint('czd-api', __name__,
@@ -25,15 +26,19 @@ def ping_pong():
 @api_blueprint.route('/puzzle/<id_>', methods=['GET'])
 def get_puzzle(id_):
     try:
+        size = request.args.get("size")
         puzzle = Puzzle.query.filter_by(id=id_).first()
-        tiles = Tile.query.filter_by(puzzle_id=puzzle.id)
+        puzzle_size = int(size) if size else puzzle.default_size
+
+        parts = process_image(puzzle.image, puzzle_size, puzzle.extension)
+        prefix = ("data:image/%s;base64," % puzzle.extension)
+        tiles = [Tile(position=i, image=(prefix + base64.b64encode(d).decode())) for i, d in enumerate(parts)]
         tiles = create_solvable_puzzle(tiles)
-        tiles = [t.serialize() for t in tiles]
 
         return jsonify(
             success=True,
             original=puzzle.serialize(),
-            tiles=tiles
+            tiles=[t.serialize() for t in tiles]
         )
     except Exception as e:
         return jsonify(success=False, message=str(e))
@@ -41,52 +46,34 @@ def get_puzzle(id_):
 
 @api_blueprint.route('/puzzle', methods=['POST'])
 def post_puzzle():
+    size = int(request.form.get('size'))
     f = request.files['file']
     name = secure_filename(f.filename)
     ext = name.split('.')[1]
     prefix = ("data:image/%s;base64," % ext)
     encoded_image = prefix + base64.b64encode(f.read()).decode()
-    parts = process_image(encoded_image, ext)
-
-    log_info('got parts')
-    images = [(prefix + base64.b64encode(d).decode()) for d in parts]
-    log_info("got images")
 
     try:
-        puzzle = Puzzle(image=encoded_image)
+        puzzle = Puzzle(image=encoded_image, extension=ext, default_size=size)
         db.session.add(puzzle)
         db.session.commit()
 
-        for idx, img in enumerate(images):
-            tile = Tile(
-                puzzle_id=puzzle.id,
-                position=idx,
-                image=img
-            )
-
-            db.session.add(tile)
-
-        db.session.commit()
         return jsonify(success=True, message=puzzle.id)
     except Exception as e:
         return jsonify(success=False, message=str(e))
+
 
 @api_blueprint.route('/puzzle/<id_>', methods=['DELETE'])
 def delete_puzzle(id_):
     try:
         puzzle = Puzzle.query.filter_by(id=id_).first()
-        tiles = Tile.query.filter_by(puzzle_id=puzzle.id)
-
-        for tile in tiles:
-            db.session.delete(tile)
-
-        db.session.commit()
         db.session.delete(puzzle)
         db.session.commit()
 
         return jsonify(success=True)
     except Exception as e:
         return jsonify(success=False, message=str(e))
+
 
 @api_blueprint.route('/puzzle-order/<size_>', methods=['GET'])
 def get_puzzle_order(size_):
@@ -106,6 +93,7 @@ def get_puzzle_order(size_):
 @api_blueprint.route('/random-puzzle', methods=['GET'])
 def get_random_puzzle():
     try:
+        # TODO pass an id to be ignored (the current one!)
         puzzle = Puzzle.query.order_by(func.random()).first()
 
         return jsonify(

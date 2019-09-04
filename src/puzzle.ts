@@ -2,14 +2,13 @@ import '@/elements/button';
 import '@/elements/loading-bouncer';
 import '@/elements/router-link';
 import '@/elements/tile';
+import { SIZES } from '@/enums/PuzzleSize';
 import { PuzzleState } from '@/interfaces/PuzzleState';
 import router from '@/router';
-import constructObjectFromSearchParams from '@/utils/constructObjectFromSearchParams';
 import query from '@/utils/query';
+import constructObjectFromSearchParams from 'ayaka/build/constructObjectFromSearchParams';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import { Tile } from './interfaces/Tile';
-
-const LAST_TILE = 8;
 
 @customElement('czd-puzzle')
 class Puzzle extends LitElement {
@@ -124,6 +123,9 @@ class Puzzle extends LitElement {
     }
 
     const puzzleSolution = this.puzzle && this.puzzle.original;
+    const { size = this.getDefaultSize() } = this.getParams();
+    const columns = '1fr '.repeat(size);
+    const lastTile = size * size - 1;
     const pageTitle = this.isSolved
       ? 'Congratulations! You solved the puzzle.'
       : 'Solve the puzzle';
@@ -143,7 +145,27 @@ class Puzzle extends LitElement {
             ? html`
                 <czd-bouncer></czd-bouncer>
               `
-            : ''}
+            : html`
+                <div class="control has-float-label has-float-label--select">
+                  <label for="size">Size</label>
+                  <select
+                    id="size"
+                    name="size"
+                    class="control__input"
+                    @change=${this.onSizeSelect}
+                  >
+                    ${SIZES.map(
+                      (op) => html`
+                        <option
+                          value=${op.value}
+                          ?selected=${op.value === Number(size)}
+                          >${op.name}</option
+                        >
+                      `
+                    )}
+                  </select>
+                </div>
+              `}
         </header>
         ${this.isSolved
           ? html`
@@ -162,14 +184,14 @@ class Puzzle extends LitElement {
               </div>
             `
           : html`
-              <div class="tile-grid">
+              <div class="tile-grid" style="grid-template-columns: ${columns};">
                 ${this.tiles.map(
                   (item) =>
                     html`
                       <czd-tile
                         .key=${item.position}
                         .image=${item.image}
-                        ?isHidden=${item.position === LAST_TILE}
+                        ?isHidden=${item.position === lastTile}
                         @select=${this.handleSelect}
                       ></czd-tile>
                     `
@@ -183,25 +205,38 @@ class Puzzle extends LitElement {
     `;
   }
 
-  private getPuzzleId() {
+  private getParams() {
     const search = window.location.search;
     const params = constructObjectFromSearchParams(search);
-    return params.key;
+    return params;
+  }
+
+  private getDefaultSize() {
+    return (this.puzzle && this.puzzle.defaultSize) || 3;
   }
 
   private initPuzzle() {
-    const puzzleId = this.getPuzzleId();
-
+    const { key: puzzleId, size = 0 } = this.getParams();
+    console.log('init', puzzleId, size);
     if (puzzleId) {
-      this.fetchPuzzle(puzzleId);
+      this.isSolved = false;
+      this.fetchPuzzle(puzzleId, size);
     } else {
       this.noPuzzle = true;
     }
   }
 
+  private onSizeSelect(event: Event) {
+    const t = event.target as HTMLSelectElement;
+    const { key } = this.getParams();
+    router.push(`/puzzle?key=${key}&size=${t.value}`);
+  }
+
   private handleSelect(event: CustomEvent) {
     const key = event.detail as number;
-    const empty = this.tiles.findIndex((x) => x.position === LAST_TILE);
+    const defaultSize = this.getDefaultSize();
+    const lastTile = defaultSize * defaultSize - 1;
+    const empty = this.tiles.findIndex((x) => x.position === lastTile);
     const pos = this.tiles.findIndex((x) => x.position === key);
 
     const inCol = empty % 3 === pos % 3;
@@ -215,7 +250,7 @@ class Puzzle extends LitElement {
       [tiles[empty], tiles[pos]] = [tiles[pos], tiles[empty]];
       this.tiles = tiles;
       this.message = '';
-      // this.tiles = tiles.sort((a, b) => (b.id < a.id ? 1 : -1));
+      this.tiles = tiles.sort((a, b) => (b.position < a.position ? 1 : -1));
       this.validatePositions();
     } else {
       this.message = 'You need to click on a piece adjacent to the empty tile!';
@@ -229,7 +264,7 @@ class Puzzle extends LitElement {
   private async resetPuzzle() {
     this.setLoading(true);
 
-    const size = 3;
+    const { size = this.getDefaultSize() } = this.getParams();
     const response = await query(`/puzzle-order/${size}`);
 
     if (response.success) {
@@ -246,16 +281,18 @@ class Puzzle extends LitElement {
     this.setLoading(false);
   }
 
-  private async fetchPuzzle(puzzleId: string) {
+  private async fetchPuzzle(puzzleId: string, size: number) {
     // this.setPuzzleData(data as PuzzleState);
     // return;
-
+    console.log('fetch', puzzleId, size);
     if (puzzleId) {
       this.setLoading(true);
-      const response = await query(`/puzzle/${puzzleId}`);
+      const param = size ? `?size=${size}` : '';
+      const response = await query(`/puzzle/${puzzleId}${param}`);
 
       if (response.success) {
         const puzzle: PuzzleState = {
+          defaultSize: response.original.defaultSize,
           original: response.original.image,
           tiles: response.tiles.map((x: any) => ({
             image: x.image,
@@ -280,7 +317,7 @@ class Puzzle extends LitElement {
   }
 
   private async onDelete() {
-    const puzzleId = this.getPuzzleId();
+    const puzzleId = this.getParams();
     if (puzzleId) {
       this.setLoading(true);
       const response = await query(`/puzzle/${puzzleId}`, { method: 'DELETE' });

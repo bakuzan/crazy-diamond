@@ -1,4 +1,5 @@
 import '@/elements/button';
+import { SIZES } from '@/enums/PuzzleSize';
 import floatLabel from '@/styles/floatLabel';
 import query from '@/utils/query';
 import { css, customElement, html, LitElement, property } from 'lit-element';
@@ -27,6 +28,9 @@ class Home extends LitElement {
     ];
   }
 
+  @property({ type: Number })
+  public size: number = 3;
+
   @property({ type: File })
   public file: File | undefined = undefined;
 
@@ -34,6 +38,23 @@ class Home extends LitElement {
     return html`
       <h1 class="page-title">Upload an image to get started</h1>
       <form class="form" @submit=${this.onSubmit}>
+        <div class="control has-float-label has-float-label--select">
+          <label for="size">Size</label>
+          <select
+            id="size"
+            name="size"
+            class="control__input"
+            @change=${this.onSelect}
+          >
+            ${SIZES.map(
+              (op) => html`
+                <option value=${op.value} ?selected=${op.value === this.size}
+                  >${op.name}</option
+                >
+              `
+            )}
+          </select>
+        </div>
         <div class="control has-float-label">
           <label for="file">Upload</label>
           <input
@@ -54,6 +75,11 @@ class Home extends LitElement {
     `;
   }
 
+  private onSelect(event: Event) {
+    const t = event.target as HTMLSelectElement;
+    this.size = Number(t.value);
+  }
+
   private onFileSelect(event: Event) {
     const t = event.target as HTMLInputElement;
     const file = t.files && t.files[0];
@@ -72,6 +98,7 @@ class Home extends LitElement {
 
     const form = new FormData();
     form.append('file', this.file);
+    form.append('size', this.size.toString());
 
     const response = await query('/puzzle', {
       body: form,
@@ -81,7 +108,7 @@ class Home extends LitElement {
     console.log(response);
     if (response.success) {
       const uid = response.message;
-      router.push(`/puzzle?key=${uid}`);
+      router.push(`/puzzle?key=${uid}&size=${this.size}`);
     } else {
       // TODO
       // Handle error

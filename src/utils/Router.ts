@@ -1,4 +1,4 @@
-import generateUniqueId from './generateUniqueId';
+import generateUniqueId from 'ayaka/build/generateUniqueId';
 
 export interface Route {
   name: string;

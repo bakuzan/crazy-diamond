@@ -47,6 +47,7 @@ def make_image_square(image):
 
     return cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_REPLICATE)
 
+
 def base64_to_cv2(encoded_image):
     encoded_data = encoded_image.split(',')[1]
     d = base64.b64decode(encoded_data)
@@ -54,11 +55,11 @@ def base64_to_cv2(encoded_image):
     return cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
 
-def process_image(encoded_image, ext):
+def process_image(encoded_image, size, ext):
     image = base64_to_cv2(encoded_image)
 
-    CROP_H_SIZE = 3
-    CROP_W_SIZE = 3
-    
+    CROP_H_SIZE = size
+    CROP_W_SIZE = size
+
     squared_image = make_image_square(image)
     return crop(ext, squared_image, CROP_H_SIZE, CROP_W_SIZE)
