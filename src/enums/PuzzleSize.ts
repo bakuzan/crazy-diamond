@@ -8,5 +8,5 @@ export const SIZES = Object.keys(PuzzleSize)
   .filter((k: any) => typeof PuzzleSize[k] === 'number')
   .map((key: any) => ({
     name: key as string,
-    value: PuzzleSize[key]
+    value: (PuzzleSize[key] as unknown) as number
   }));

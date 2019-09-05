@@ -5,6 +5,7 @@ import '@/elements/tile';
 import { SIZES } from '@/enums/PuzzleSize';
 import { PuzzleState } from '@/interfaces/PuzzleState';
 import router from '@/router';
+import floatLabel from '@/styles/floatLabel';
 import query from '@/utils/query';
 import constructObjectFromSearchParams from 'ayaka/build/constructObjectFromSearchParams';
 import { css, customElement, html, LitElement, property } from 'lit-element';
@@ -13,58 +14,64 @@ import { Tile } from './interfaces/Tile';
 @customElement('czd-puzzle')
 class Puzzle extends LitElement {
   static get styles() {
-    return css`
-      :host,
-      .container {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-      }
+    return [
+      floatLabel,
+      css`
+        :host,
+        .container {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
 
-      .header {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-      }
-      .header__inner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
+        .header {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+        }
+        .header__inner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .has-float-label--select {
+          max-width: 60px;
+        }
 
-      .tile-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-auto-rows: 1fr;
-        grid-gap: 2px;
-        background-color: var(--secondary-colour);
-        padding: 2px;
-        box-shadow: 1px 1px 2px 0px var(--primary-colour),
-          0px 0px 1px 0px var(--primary-colour);
-        margin: auto;
-      }
+        .tile-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          grid-auto-rows: 1fr;
+          grid-gap: 2px;
+          background-color: var(--secondary-colour);
+          padding: 2px;
+          box-shadow: 1px 1px 2px 0px var(--primary-colour),
+            0px 0px 1px 0px var(--primary-colour);
+          margin: 10px auto;
+        }
 
-      .success-summary {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin: auto;
-      }
-      .success-summary__actions {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        width: 100%;
-        margin: 10px 0;
-      }
+        .success-summary {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: auto;
+        }
+        .success-summary__actions {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+          width: 100%;
+          margin: 10px 0;
+        }
 
-      .feedback {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        padding: 5px 0;
-      }
-    `;
+        .feedback {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+          padding: 5px 0;
+        }
+      `
+    ];
   }
 
   @property({ type: Object })
@@ -123,7 +130,7 @@ class Puzzle extends LitElement {
     }
 
     const puzzleSolution = this.puzzle && this.puzzle.original;
-    const { size = this.getDefaultSize() } = this.getParams();
+    const size = this.getDefaultSize('tiles');
     const columns = '1fr '.repeat(size);
     const lastTile = size * size - 1;
     const pageTitle = this.isSolved
@@ -211,8 +218,14 @@ class Puzzle extends LitElement {
     return params;
   }
 
-  private getDefaultSize() {
-    return (this.puzzle && this.puzzle.defaultSize) || 3;
+  private getDefaultSize(mode: 'puzzle' | 'tiles' = 'puzzle') {
+    const puzzle = (this.puzzle && this.puzzle.defaultSize) || 3;
+
+    if (mode === 'tiles') {
+      return Math.sqrt(this.tiles.length) || puzzle;
+    }
+
+    return puzzle;
   }
 
   private initPuzzle() {
@@ -234,15 +247,15 @@ class Puzzle extends LitElement {
 
   private handleSelect(event: CustomEvent) {
     const key = event.detail as number;
-    const defaultSize = this.getDefaultSize();
-    const lastTile = defaultSize * defaultSize - 1;
+    const { size: dimension = this.getDefaultSize() } = this.getParams();
+    const lastTile = dimension * dimension - 1;
     const empty = this.tiles.findIndex((x) => x.position === lastTile);
     const pos = this.tiles.findIndex((x) => x.position === key);
 
-    const inCol = empty % 3 === pos % 3;
-    const colAdjacent = Math.abs(empty - pos) === 3;
+    const inCol = empty % dimension === pos % dimension;
+    const colAdjacent = Math.abs(empty - pos) === dimension;
 
-    const inRow = Math.floor(empty / 3) === Math.floor(pos / 3);
+    const inRow = Math.floor(empty / dimension) === Math.floor(pos / dimension);
     const rowAdjacent = Math.abs(empty - pos) === 1;
 
     if ((inCol && colAdjacent) || (inRow && rowAdjacent)) {

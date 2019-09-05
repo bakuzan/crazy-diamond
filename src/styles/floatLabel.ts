@@ -74,6 +74,7 @@ export default css`
     top: 1em;
   }
   .has-float-label select {
+    width: 100%;
     padding: 0.75em 0.25em 0 0.75em;
     margin-bottom: 0;
     cursor: pointer;

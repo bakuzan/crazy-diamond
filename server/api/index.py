@@ -8,9 +8,9 @@ import re
 from database.index import db
 from database.models import Puzzle
 from models.Tile import Tile
+from image_processing.process import process_image
 from utils.logger import log_info, log_error
 from utils.base64_helpers import base64_url_decode
-from utils.image_cropper import process_image
 from utils.solvable_puzzle import create_solvable_puzzle, create_solvable_order
 
 # Create the api blueprint
@@ -32,7 +32,8 @@ def get_puzzle(id_):
 
         parts = process_image(puzzle.image, puzzle_size, puzzle.extension)
         prefix = ("data:image/%s;base64," % puzzle.extension)
-        tiles = [Tile(position=i, image=(prefix + base64.b64encode(d).decode())) for i, d in enumerate(parts)]
+        tiles = [Tile(position=i, image=(prefix + base64.b64encode(d).decode()))
+                 for i, d in enumerate(parts)]
         tiles = create_solvable_puzzle(tiles)
 
         return jsonify(
@@ -93,8 +94,9 @@ def get_puzzle_order(size_):
 @api_blueprint.route('/random-puzzle', methods=['GET'])
 def get_random_puzzle():
     try:
-        # TODO pass an id to be ignored (the current one!)
-        puzzle = Puzzle.query.order_by(func.random()).first()
+        ignore_id = request.args.get("ignorePuzzleId")
+        puzzle = Puzzle.query.filter(
+            Puzzle.id != ignore_id).order_by(func.random()).first()
 
         return jsonify(
             success=True,

@@ -2,6 +2,7 @@ import '@/elements/router-link';
 import '@/home';
 import '@/puzzle';
 import query from '@/utils/query';
+import constructObjectFromSearchParams from 'ayaka/build/constructObjectFromSearchParams';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import router from './router';
 
@@ -90,7 +91,11 @@ class RouterView extends LitElement {
   }
 
   private async fetchRandomId() {
-    const response = await query(`/random-puzzle`);
+    const { key: ignorePuzzleId } = constructObjectFromSearchParams(
+      window.location.search
+    );
+    const param = ignorePuzzleId ? `?ignorePuzzleId=${ignorePuzzleId}` : '';
+    const response = await query(`/random-puzzle${param}`);
 
     if (response.success) {
       this.randomId = response.message;
