@@ -2,9 +2,9 @@ import cv2
 import base64
 import numpy as np
 
-from square import make_image_square
-from scale import scale_image
-from crop import crop_image
+from .square import make_image_square
+from .scale import scale_image
+from .crop import crop_image
 
 
 def base64_to_cv2(encoded_image):

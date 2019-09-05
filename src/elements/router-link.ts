@@ -1,7 +1,7 @@
 import { css, customElement, html, LitElement, property } from 'lit-element';
 
 import router from '@/router';
-import guardEvent from '@/utils/guardEvent';
+import guardEvent from 'ayaka/guardEvent';
 
 @customElement('czd-router-link')
 class RouterLink extends LitElement {

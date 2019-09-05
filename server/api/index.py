@@ -1,3 +1,4 @@
+from os import environ
 from flask import Blueprint, request, jsonify, abort
 from sqlalchemy.sql.expression import func
 from werkzeug.utils import secure_filename
@@ -39,7 +40,8 @@ def get_puzzle(id_):
         return jsonify(
             success=True,
             original=puzzle.serialize(),
-            tiles=[t.serialize() for t in tiles]
+            tiles=[t.serialize() for t in tiles],
+            maxImageSize=environ.get("MAX_IMAGE_SIZE", "")
         )
     except Exception as e:
         return jsonify(success=False, message=str(e))

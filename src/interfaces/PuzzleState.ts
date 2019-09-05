@@ -1,7 +1,8 @@
 import { Tile } from './Tile';
 
 export interface PuzzleState {
-  original: string;
   defaultSize: number;
+  maxImageSize: string;
+  original: string;
   tiles: Tile[];
 }

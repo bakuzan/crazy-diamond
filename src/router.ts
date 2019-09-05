@@ -1,5 +1,5 @@
+import Router from 'ayaka/Router';
 import { html } from 'lit-element';
-import Router from './utils/Router';
 
 const baseUrl = '/';
 

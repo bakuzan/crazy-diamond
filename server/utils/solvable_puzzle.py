@@ -41,7 +41,6 @@ def find_x_position(puzzle):
     n = get_n(puzzle)
     matrix = chunks(puzzle, n)
     
-    print(length, n, last_piece_num)
     for i in reversed(range(n)):
         for j in reversed(range(n)):
             if matrix[i][j] == last_piece_num:
@@ -53,7 +52,7 @@ def is_solvable(puzzle):
     n = get_n(puzzle)
     # Count inversions in given puzzle
     inv_count = get_inversion_count(puzzle)
-    print(n, inv_count)
+
     # If grid is odd, return true if inversion count is even.
     # else grid is even
     if n % 2 != 0:

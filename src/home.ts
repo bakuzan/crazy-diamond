@@ -34,6 +34,9 @@ class Home extends LitElement {
   @property({ type: File })
   public file: File | undefined = undefined;
 
+  @property({ type: String })
+  public message: string = '';
+
   public render() {
     return html`
       <h1 class="page-title">Upload an image to get started</h1>
@@ -71,6 +74,7 @@ class Home extends LitElement {
         <czd-button type="submit" primary @onClick=${this.onSubmit}
           >Submit</czd-button
         >
+        <div class="feedback">${this.message}</div>
       </form>
     `;
   }
@@ -89,13 +93,13 @@ class Home extends LitElement {
 
   private async onSubmit(event: Event) {
     event.preventDefault();
-    console.log('submit', this.file);
+
     if (!this.file) {
-      // TODO
-      // File is required!
+      this.message = `An image file is required.`;
       return;
     }
 
+    this.message = '';
     const form = new FormData();
     form.append('file', this.file);
     form.append('size', this.size.toString());

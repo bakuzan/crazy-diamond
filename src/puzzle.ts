@@ -7,7 +7,7 @@ import { PuzzleState } from '@/interfaces/PuzzleState';
 import router from '@/router';
 import floatLabel from '@/styles/floatLabel';
 import query from '@/utils/query';
-import constructObjectFromSearchParams from 'ayaka/build/constructObjectFromSearchParams';
+import constructObjectFromSearchParams from 'ayaka/constructObjectFromSearchParams';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import { Tile } from './interfaces/Tile';
 
@@ -130,6 +130,10 @@ class Puzzle extends LitElement {
     }
 
     const puzzleSolution = this.puzzle && this.puzzle.original;
+    const maxImageSize = this.puzzle && this.puzzle.maxImageSize;
+    const maxPuzzleWidth = maxImageSize
+      ? `max-width: ${maxImageSize}px; max-height: ${maxImageSize}px;`
+      : '';
     const size = this.getDefaultSize('tiles');
     const columns = '1fr '.repeat(size);
     const lastTile = size * size - 1;
@@ -178,7 +182,11 @@ class Puzzle extends LitElement {
           ? html`
               <div class="success-summary">
                 <div>
-                  <img src="${puzzleSolution}" alt="Puzzle Solution" />
+                  <img
+                    src="${puzzleSolution}"
+                    alt="Puzzle Solution"
+                    style="${maxPuzzleWidth}"
+                  />
                 </div>
                 <div class="success-summary__actions">
                   <czd-router-link .href="${router.base}" primary buttonise
@@ -230,7 +238,7 @@ class Puzzle extends LitElement {
 
   private initPuzzle() {
     const { key: puzzleId, size = 0 } = this.getParams();
-    console.log('init', puzzleId, size);
+
     if (puzzleId) {
       this.isSolved = false;
       this.fetchPuzzle(puzzleId, size);
@@ -263,7 +271,7 @@ class Puzzle extends LitElement {
       [tiles[empty], tiles[pos]] = [tiles[pos], tiles[empty]];
       this.tiles = tiles;
       this.message = '';
-      this.tiles = tiles.sort((a, b) => (b.position < a.position ? 1 : -1));
+      // this.tiles = tiles.sort((a, b) => (b.position < a.position ? 1 : -1));
       this.validatePositions();
     } else {
       this.message = 'You need to click on a piece adjacent to the empty tile!';
@@ -295,9 +303,6 @@ class Puzzle extends LitElement {
   }
 
   private async fetchPuzzle(puzzleId: string, size: number) {
-    // this.setPuzzleData(data as PuzzleState);
-    // return;
-    console.log('fetch', puzzleId, size);
     if (puzzleId) {
       this.setLoading(true);
       const param = size ? `?size=${size}` : '';
@@ -306,6 +311,7 @@ class Puzzle extends LitElement {
       if (response.success) {
         const puzzle: PuzzleState = {
           defaultSize: response.original.defaultSize,
+          maxImageSize: response.maxImageSize,
           original: response.original.image,
           tiles: response.tiles.map((x: any) => ({
             image: x.image,

@@ -2,7 +2,7 @@ import '@/elements/router-link';
 import '@/home';
 import '@/puzzle';
 import query from '@/utils/query';
-import constructObjectFromSearchParams from 'ayaka/build/constructObjectFromSearchParams';
+import constructObjectFromSearchParams from 'ayaka/constructObjectFromSearchParams';
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import router from './router';
 
