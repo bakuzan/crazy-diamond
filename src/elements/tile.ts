@@ -10,6 +10,7 @@ class Tile extends LitElement {
         align-items: center;
       }
       .tile__button {
+        position: relative;
         display: flex;
         background: none;
         padding: 0;
@@ -18,8 +19,27 @@ class Tile extends LitElement {
       .tile__button:not([disabled]) {
         cursor: pointer;
       }
-      .image {
+      .tile__button:not([disabled])::before {
+        visibility: hidden;
+        opacity: 0;
+        content: attr(data-tile-number);
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: var(--primary-colour);
+        color: var(--primary-contrast);
+        min-width: 0.75rem;
+        padding: 2px;
+        border: 1px solid transparent;
+        border-radius: 50%;
+        transition: visibility 0s, opacity 0.25s ease-in-out 0.75s;
       }
+      .tile__button:not([disabled]):focus::before,
+      .tile__button:not([disabled]):hover::before {
+        visibility: visible;
+        opacity: 1;
+      }
+
       .image--hidden {
         visibility: hidden;
       }
@@ -45,6 +65,7 @@ class Tile extends LitElement {
         <button
           class="tile__button"
           type="button"
+          data-tile-number="${this.key + 1}"
           ?disabled=${this.isHidden}
           @click=${this.onClick}
         >
