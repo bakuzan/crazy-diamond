@@ -333,10 +333,12 @@ class Puzzle extends LitElement {
   private setPuzzleData(puzzle: PuzzleState) {
     this.puzzle = puzzle;
     this.tiles = puzzle.tiles;
+    this.noPuzzle = false;
   }
 
   private async onDelete() {
-    const puzzleId = this.getParams();
+    const { key: puzzleId } = this.getParams();
+
     if (puzzleId) {
       this.setLoading(true);
       const response = await query(`/puzzle/${puzzleId}`, { method: 'DELETE' });
