@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Crazy Diamond page {{ puzzles.page }} of puzzles"
+    />
+    <meta name="theme-color" content="#f8d2d2" />
+
+    <title>Puzzles, Page {{ puzzles.page }} | Crazy Diamond</title>
+
+    <style>
+      :root {
+        --font-size: 16px;
+        --font-family: 'Lucida Console', 'Courier New', monospace;
+
+        --primary-colour: #f8d2d2; /*#e87c7c;*/
+
+        --secondary-colour: hsl(177, 36%, 39%); /*#96cecb;*/
+        --secondary-colour-hovered: #4fa9a5;
+
+        --shadow-colour: var(--secondary-colour);
+        --action-bar-height: 51px;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        overflow-y: auto;
+      }
+      body,
+      button {
+        font-family: var(--font-family);
+        font-size: var(--font-size);
+      }
+
+      .action-bar {
+        display: flex;
+        align-items: center;
+        background-color: var(--primary-colour);
+        min-height: var(--action-bar-height);
+        padding: 10px 15px;
+        box-shadow: 1px 1px 2px 2px var(--shadow-colour);
+        box-sizing: border-box;
+      }
+
+      .header {
+        padding: 0 10px;
+      }
+      .title {
+        margin-bottom: 0;
+      }
+      .subtitle {
+        font-size: 0.75rem;
+      }
+
+      .puzzles {
+        display: grid;
+        padding: 0 15px;
+        margin: 20px 0;
+      }
+      .puzzles__entry {
+        display: flex;
+        padding: 5px 0;
+      }
+      .puzzles__content {
+        padding: 0 5px;
+      }
+      .puzzles__content > div {
+        margin-bottom: 5px;
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        max-width: 25vw;
+        margin: 10px;
+      }
+      .navigation > div {
+        display: flex;
+        flex: 1;
+      }
+
+      .router-link--nav {
+        text-decoration: none;
+        font-size: 1.25rem;
+        color: var(--secondary-colour);
+      }
+      .router-link--nav:hover {
+        color: var(--secondary-colour-hovered);
+      }
+    </style>
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+  </head>
+  <body>
+    <noscript>
+      <strong
+        >We're sorry but Crazy Diamond doesn't work properly without JavaScript
+        enabled. Please enable it to continue.</strong
+      >
+    </noscript>
+    <nav class="action-bar">
+      <a class="router-link router-link--nav" href="/">Home</a>
+    </nav>
+    <main>
+      <header class="header">
+        <h1 class="title">Puzzles</h1>
+        <div class="subtitle">
+          <div>Page {{ puzzles.page }} of {{ puzzles.pages }}</div>
+          <div>
+            Showing {{ min(puzzles.per_page, len(puzzles.items)) }} puzzles of
+            {{ puzzles.total }}
+          </div>
+        </div>
+      </header>
+      <ul class="puzzles">
+        {% for puzzle in puzzles.items %} {% include '_puzzle.html' %} {% endfor
+        %}
+      </ul>
+      <nav class="navigation">
+        <div>
+          {% if prev_url %}
+          <a href="{{ prev_url }}"> < page {{ puzzles.prev_num }}</a>
+          {% endif %} {% if next_url %}
+        </div>
+        <div>
+          <a href="{{ next_url }}">page {{ puzzles.next_num }} > </a>
+          {% endif %}
+        </div>
+      </nav>
+    </main>
+  </body>
+</html>

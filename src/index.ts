@@ -12,7 +12,6 @@ class RouterView extends LitElement {
     return css`
       :host,
       main {
-        --action-bar-height: 51px;
         min-height: calc(100vh - 10px - var(--action-bar-height));
       }
 

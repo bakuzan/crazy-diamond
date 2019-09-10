@@ -1,4 +1,5 @@
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 
@@ -66,7 +67,11 @@ module.exports = (env) => {
         inject: 'head',
         template: 'public/index.html',
         favicon: 'public/favicon.ico'
-      })
+      }),
+      new CopyPlugin([
+        { from: 'public/puzzles.html', to: 'puzzles.html' },
+        { from: 'public/_puzzle.html', to: '_puzzle.html' }
+      ])
     ]
   };
 };
