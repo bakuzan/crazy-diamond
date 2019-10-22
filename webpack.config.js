@@ -7,7 +7,7 @@ const WebpackPwaManifest = require('webpack-pwa-manifest');
 
 module.exports = (env) => {
   const isDev = env.MODE === 'development';
-  const publicPath = isDev ? '/' : '/static';
+  const publicPath = isDev ? '/' : '/static/';
   const productionPlugins = isDev
     ? []
     : [
