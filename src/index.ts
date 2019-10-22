@@ -9,7 +9,7 @@ import router from './router';
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/galko/sw.js')
+      .register('/static/sw.js')
       .then((reg) => console.log('SW registered: ', reg))
       .catch((regError) => console.log('SW registration failed: ', regError));
   });
