@@ -1,11 +1,37 @@
+const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
+const WorkboxPlugin = require('workbox-webpack-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest');
 
 module.exports = (env) => {
   const isDev = env.MODE === 'development';
   const publicPath = isDev ? '/' : '/static';
+  const productionPlugins = isDev
+    ? []
+    : [
+        new WebpackPwaManifest({
+          name: 'Crazy Diamond',
+          short_name: 'CZD',
+          description: 'Crazy Diamond is an image sliding puzzle game.',
+          background_color: '#ffffff',
+          theme_color: '#f8d2d2',
+          crossorigin: 'use-credentials', //can be null, use-credentials or anonymous
+          icons: [
+            {
+              src: path.resolve('public/favicon.png'),
+              destination: path.join('icons'),
+              sizes: [32, 96, 128, 192, 256, 384, 512]
+            }
+          ]
+        }),
+        new WorkboxPlugin.GenerateSW({
+          swDest: path.resolve('dist', 'sw.js'),
+          clientsClaim: true,
+          skipWaiting: true
+        })
+      ];
 
   return {
     mode: env.MODE,
@@ -71,7 +97,8 @@ module.exports = (env) => {
       new CopyPlugin([
         { from: 'public/puzzles.html', to: 'puzzles.html' },
         { from: 'public/_puzzle.html', to: '_puzzle.html' }
-      ])
+      ]),
+      ...productionPlugins
     ]
   };
 };
