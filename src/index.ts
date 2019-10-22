@@ -6,6 +6,15 @@ import constructObjectFromSearchParams from 'ayaka/constructObjectFromSearchPara
 import { css, customElement, html, LitElement, property } from 'lit-element';
 import router from './router';
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/galko/sw.js')
+      .then((reg) => console.log('SW registered: ', reg))
+      .catch((regError) => console.log('SW registration failed: ', regError));
+  });
+}
+
 @customElement('czd-router-view')
 class RouterView extends LitElement {
   static get styles() {
