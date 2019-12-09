@@ -2,6 +2,7 @@ import Router from 'ayaka/Router';
 import { html } from 'lit-element';
 
 const baseUrl = '/';
+const baseTitle = 'Crazy Diamond';
 
 const router = new Router(
   [
@@ -19,10 +20,11 @@ const router = new Router(
         html`
           <czd-puzzle></czd-puzzle>
         `,
+      title: 'Puzzle',
       url: '/puzzle'
     }
   ],
-  baseUrl
+  { baseUrl, baseTitle }
 );
 
 export default router;
