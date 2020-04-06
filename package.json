@@ -34,31 +34,31 @@
     "url": "https://github.com/bakuzan/crazy-diamond/issues"
   },
   "devDependencies": {
-    "@types/jest": "^25.1.4",
+    "@types/jest": "^25.1.5",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
-    "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^3.2.0",
+    "html-loader": "^1.1.0",
+    "html-webpack-plugin": "^4.0.4",
     "husky": "^4.2.3",
-    "jest": "^25.1.0",
+    "jest": "^25.2.7",
     "jest-localstorage-mock": "^2.4.0",
-    "lint-staged": "^10.0.8",
-    "prettier": "^1.19.1",
+    "lint-staged": "^10.1.1",
+    "prettier": "^2.0.2",
     "string-replace-loader": "^2.2.0",
-    "ts-jest": "^25.2.1",
-    "ts-loader": "^6.2.1",
-    "tslint": "^6.1.0",
+    "ts-jest": "^25.3.0",
+    "ts-loader": "^6.2.2",
+    "tslint": "^6.1.1",
     "tslint-config-prettier": "^1.18.0",
-    "tslint-plugin-prettier": "^2.2.0",
+    "tslint-plugin-prettier": "^2.3.0",
     "typescript": "^3.8.3",
-    "webpack": "^4.42.0",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
     "webpack-pwa-manifest": "^4.2.0",
-    "workbox-webpack-plugin": "^5.0.0"
+    "workbox-webpack-plugin": "^5.1.2"
   },
   "dependencies": {
     "ayaka": "npm:bkz-ayaka@^2.1.0",
-    "lit-element": "^2.2.1"
+    "lit-element": "^2.3.1"
   }
 }
