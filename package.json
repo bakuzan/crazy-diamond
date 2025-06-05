@@ -53,7 +53,7 @@
     "typescript": "^3.9.7",
     "webpack": "^5.94.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.11.1",
+    "webpack-dev-server": "^5.2.1",
     "webpack-pwa-manifest": "^4.3.0",
     "workbox-webpack-plugin": "^7.3.0"
   },
